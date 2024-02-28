@@ -1,6 +1,6 @@
 let intentos = 6;
-let listado_palabras = ['LIMON', 'TIGRE', 'JARDN', 'ROBLE', 'LUZON', 'PIELA', 'EXCES', 'CALOR', 'NINOS', 'PLUMA'];
-let palabra = listado_palabras[0];
+let listado_palabras = ['LIMON', 'TIGRE', 'SALIR', 'ROBLE', 'GRUPO', 'ZORRO', 'CARNE', 'CALOR', 'PERRO', 'PLUMA'];
+let palabra = listado_palabras[Math.floor(Math.random() * listado_palabras.length)];
 
 const BUTTON = document.getElementById("guess-button");
 const INPUT = document.getElementById("guess-input");
@@ -10,6 +10,7 @@ const GRID = document.getElementById("grid");
 	
 
 window.addEventListener('load', init);
+
 BUTTON.addEventListener('click', intentar);
 
 function intentar() {
