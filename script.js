@@ -10,15 +10,14 @@ const CONTENEDOR = document.getElementById("guesses");
 const GRID = document.getElementById("grid");
 const openaiApiKey = 'test'; // Replace with your OpenAI API key
 
-	
+
+window.addEventListener('load', init);
+
 // Supongamos que tienes una variable secreta llamada MY_SECRET_KEY
-const secretKey = process.env.MY_SECRET_KEY;
+const secretKey = process.env.API_KEY;
 
 // Haz algo con la variable secreta
 console.log(secretKey);
-
-
-window.addEventListener('load', init);
 
 async function setup() {
     const WORD = await api_call();
