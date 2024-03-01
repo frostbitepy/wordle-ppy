@@ -1,24 +1,68 @@
 let intentos = 6;
-let listado_palabras = ['LIMON', 'TIGRE', 'SALIR', 'ROBLE', 'GRUPO', 'ZORRO', 'CARNE', 'CALOR', 'PERRO', 'PLUMA'];
-let palabra = listado_palabras[Math.floor(Math.random() * listado_palabras.length)];
+//let listado_palabras = ['LIMON', 'TIGRE', 'SALIR', 'ROBLE', 'GRUPO', 'ZORRO', 'CARNE', 'CALOR', 'PERRO', 'PLUMA'];
+// let palabra = listado_palabras[Math.floor(Math.random() * listado_palabras.length)];
+
 
 const BUTTON = document.getElementById("guess-button");
 const INPUT = document.getElementById("guess-input");
 const VALOR = INPUT.value;
 const CONTENEDOR = document.getElementById("guesses");
 const GRID = document.getElementById("grid");
+const openaiApiKey = 'test'; // Replace with your OpenAI API key
+
 	
+// Supongamos que tienes una variable secreta llamada MY_SECRET_KEY
+const secretKey = process.env.MY_SECRET_KEY;
+
+// Haz algo con la variable secreta
+console.log(secretKey);
+
 
 window.addEventListener('load', init);
 
-BUTTON.addEventListener('click', intentar);
+async function setup() {
+    const WORD = await api_call();
 
-function intentar() {
+    BUTTON.addEventListener('click', function () {
+        intentar(WORD);
+    });
+}
+
+setup();
+
+async function api_call() {
+	const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    	method: 'POST',
+    	headers: {
+      	'Content-Type': 'application/json',
+      	'Authorization': `Bearer ${openaiApiKey}`,
+    	},
+    	body: JSON.stringify({
+      		model: 'gpt-3.5-turbo',
+			messages: [{"role": "user", "content": "Genera una palabra aleatoria en español de 5 letras, devuelve solo la una palabra donde palabra.len == 5 "}],
+      		// prompt: 'Genera una palabra en español de 5 letras:',
+      		max_tokens: 5,
+      		temperature: 0.6, // Set temperature to the maximum for more randomness
+    	}),
+    });
+
+	const result = await response.json();
+	console.log(result);
+	console.log(result.choices[0]?.message?.content);
+  	const generatedWord = result.choices[0]?.message?.content;
+
+	return generatedWord.trim();
+}
+
+async function intentar(WORD) {
 	const USER_INPUT = leerIntento();
 	const ROW = document.createElement("div");
 	ROW.className = "row";
+	console.log("Al darle intentar la palabra es: " + WORD);
+	const palabra = WORD.toUpperCase();
 
 	if (USER_INPUT === palabra) {
+		console.log("Al ganar la palabra es: " + palabra)
 		terminar("GANASTE!");
 		for (let i in USER_INPUT) {
 			const SPAN = document.createElement("span");
@@ -32,6 +76,7 @@ function intentar() {
 	}
 	
 	for (let i in palabra) {
+		console.log("dentro del for palabra: " + palabra)
 		const SPAN = document.createElement("span");
 		SPAN.className = "letter";
 		if (USER_INPUT[i] === palabra[i]) {
@@ -54,6 +99,7 @@ function intentar() {
 	intentos --; // Reduce la cantidad de intentos
 	
 	if (intentos == 0 ) {
+		console.log("al perder la palabra es: " + palabra);
 		terminar("PERDISTE!");
 	}
 }
