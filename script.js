@@ -16,8 +16,8 @@ window.addEventListener('load', init);
 // Supongamos que tienes una variable secreta llamada MY_SECRET_KEY
 const secretKey = process.env.API_KEY;
 
-// Haz algo con la variable secreta
-console.log(secretKey);
+
+
 
 async function setup() {
     const WORD = await api_call();
@@ -105,6 +105,7 @@ async function intentar(WORD) {
 
 function init() {
 	console.log("El trigger funciona!");
+	console.log(secretKey);
 }
 
 function leerIntento() {
