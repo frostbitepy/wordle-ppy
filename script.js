@@ -8,7 +8,7 @@ const INPUT = document.getElementById("guess-input");
 const VALOR = INPUT.value;
 const CONTENEDOR = document.getElementById("guesses");
 const GRID = document.getElementById("grid");
-const openaiApiKey = 'some_api_key'; // Replace with your OpenAI API key
+const openaiApiKey = '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'; // Replace with your OpenAI API key
 
 
 window.addEventListener('load', init);
@@ -16,17 +16,15 @@ window.addEventListener('load', init);
 setup();
 
 
-
 async function intentar(WORD) {
 	const USER_INPUT = read_input();
 	const ROW = document.createElement("div");
 	ROW.className = "row";
-	console.log("Al darle intentar la palabra es: " + WORD);
 	const palabra = WORD.toUpperCase();
 	console.log("Don't cheat!! " + palabra);
 
 	if (USER_INPUT === palabra){
-		winning(ROW, USER_INPUT, palabra);
+		winning(ROW, USER_INPUT);
 		return;
 	} else {
 		continuing(ROW, USER_INPUT, palabra);
@@ -35,6 +33,7 @@ async function intentar(WORD) {
 	intentos --; 
 	
 	losing(intentos, palabra);
+	
 }
 
 function init() {
@@ -57,13 +56,12 @@ function read_input() {
 
 function terminar(mensaje) {
 	INPUT.style.display = "none";
-	BUTTON.style.display = "none";
+	// BUTTON.style.display = "none";
 	CONTENEDOR.style.display = "block";
 	CONTENEDOR.innerHTML = mensaje;
 }
 
-function winning(ROW, USER_INPUT, palabra){
-		console.log("Al ganar la palabra es: " + palabra)
+function winning(ROW, USER_INPUT){
 		terminar("GANASTE!");
 		for (let i in USER_INPUT) {
 			const SPAN = document.createElement("span");
@@ -73,26 +71,28 @@ function winning(ROW, USER_INPUT, palabra){
 			ROW.appendChild(SPAN);
 		}
 		GRID.appendChild(ROW);
+		BUTTON.innerHTML = "Juega de nuevo"
+		BUTTON.addEventListener('click', function () {
+			restart();
+		});
+
+
 		return;
 }
 
 function continuing(ROW, USER_INPUT, palabra){
 	for (let i in palabra) {
-		console.log("dentro del for palabra: " + palabra)
 		const SPAN = document.createElement("span");
 		SPAN.className = "letter";
 		if (USER_INPUT[i] === palabra[i]) {
 			SPAN.innerHTML = USER_INPUT[i];
 			SPAN.style.backgroundColor = "#79b851";
-			console.log(USER_INPUT[i], "verde");
 		} else if (palabra.includes(USER_INPUT[i])) {
 			SPAN.innerHTML = USER_INPUT[i];
 			SPAN.style.backgroundColor = "#f3c237";
-			console.log(USER_INPUT[i], "amarillo");
 		} else {
 			SPAN.innerHTML = USER_INPUT[i];
 			SPAN.style.backgroundColor = "#a4aec4";
-			console.log(USER_INPUT[i], "gris");
 		}
 		ROW.appendChild(SPAN);
 	}
@@ -103,10 +103,36 @@ function losing(intentos, palabra) {
 	if (intentos == 0 ) {
 		console.log("Se acabaron los intentos, la palabra era: " + palabra);
 		terminar("PERDISTE!");
+		BUTTON.innerHTML = "Juega de nuevo"
+		BUTTON.addEventListener('click', function () {
+			restart();
+		});
 	}
 }
 
+function restart() {
+	location.reload();
+	return false;
+}
 async function api_call() {
+	const response = await fetch('https://random-word-api.herokuapp.com/word?number=1000&lang=es');
+
+	const result = await response.json();
+
+    if (!response.ok) {
+        const generateWord = listado_palabras[Math.floor(Math.random() * listado_palabras.length)];
+        return generateWord
+    } else {
+        const five_letters_words = result.filter(word => word.length === 5 && word[0] === word[0].toLowerCase());
+        const words_without_accents = five_letters_words.map(word => word.normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+        console.log(words_without_accents);
+		const random_index = Math.floor(Math.random() * words_without_accents.length);
+		const random_word = words_without_accents[random_index];
+		return random_word;
+    }  	
+}
+
+async function openai_api_call() {
 	const response = await fetch('https://api.openai.com/v1/chat/completions', {
     	method: 'POST',
     	headers: {
@@ -115,7 +141,7 @@ async function api_call() {
     	},
     	body: JSON.stringify({
       		model: 'gpt-3.5-turbo',
-			messages: [{"role": "user", "content": "Genera una palabra aleatoria en español de 5 letras, devuelve solo la una palabra donde palabra.len == 5 "}],
+			messages: [{"role": "user", "content": "Genera una palabra aleatoria en español de 5 letras, devuelve solo la palabra donde palabra.len == 5 "}],
       		temperature: 0.6, 
     	}),
     });
