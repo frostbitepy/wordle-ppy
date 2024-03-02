@@ -2,19 +2,16 @@ let intentos = 6;
 let listado_palabras = ['LIMON', 'TIGRE', 'SALIR', 'ROBLE', 'GRUPO', 'LUNAR', 'CARNE', 'CALOR', 'POLAR', 'PLUMA'];
 // let palabra = listado_palabras[Math.floor(Math.random() * listado_palabras.length)];
 
-
 const BUTTON = document.getElementById("guess-button");
 const INPUT = document.getElementById("guess-input");
 const VALOR = INPUT.value;
 const CONTENEDOR = document.getElementById("guesses");
 const GRID = document.getElementById("grid");
-const openaiApiKey = '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'; // Replace with your OpenAI API key
-
+const openaiApiKey = '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'; 
 
 window.addEventListener('load', init);
 
 setup();
-
 
 async function intentar(WORD) {
 	const USER_INPUT = read_input();
@@ -28,12 +25,10 @@ async function intentar(WORD) {
 		return;
 	} else {
 		continuing(ROW, USER_INPUT, palabra);
-	}		
-
+	}
+	
 	intentos --; 
-	
 	losing(intentos, palabra);
-	
 }
 
 function init() {
@@ -56,7 +51,6 @@ function read_input() {
 
 function terminar(mensaje) {
 	INPUT.style.display = "none";
-	// BUTTON.style.display = "none";
 	CONTENEDOR.style.display = "block";
 	CONTENEDOR.innerHTML = mensaje;
 }
@@ -132,6 +126,7 @@ async function api_call() {
     }  	
 }
 
+/*
 async function openai_api_call() {
 	const response = await fetch('https://api.openai.com/v1/chat/completions', {
     	method: 'POST',
@@ -158,3 +153,4 @@ async function openai_api_call() {
 		return generatedWord.trim();
 	}	
 }
+*/
